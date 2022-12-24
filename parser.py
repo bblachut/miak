@@ -1,10 +1,14 @@
-from typing import Tuple
+from typing import Tuple, List
 
 from resources import Token, keywords
 
 
 class Parser:
-    def _scanner(self, text: str, i: int) -> Tuple[int, Token, str]:
+    def __init__(self, pseudocode: str) -> None:
+        self.tokens = self._parse(pseudocode)
+
+    @staticmethod
+    def _scanner(text: str, i: int) -> Tuple[int, Token, str]:
         if len(text) > i + 1 and text[i: i + 2] == '<-':
             return i + 1, Token.ASSIGN, '<-'
         if text[i] == '{':
@@ -54,17 +58,25 @@ class Parser:
             return i, Token.WHITESPACE, text[i]
         return i, Token.ERROR, text[i]
 
-    def parse(self, text: str) -> None:
+    def _parse(self, text: str) -> List[Tuple[str, Token]]:
+        tokens = []
         i = 0
         while i < len(text):
             i, token, communicat = self._scanner(text, i)
-            print(communicat, token)
+            tokens.append((communicat, token))
             i += 1
+        return tokens
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return self.tokens.pop(0)
+
 
 
 if __name__ == '__main__':
-    parser = Parser()
-    parser.parse('''x <- 1
+    pseudocode = '''x <- 1
 if x = 1{
     y<-2
 } else {
@@ -82,4 +94,7 @@ my_print(5)
 
 arr = [1,2,3]
 z <- arr[2]
-''')
+'''
+    parser = Parser(pseudocode)
+    for token in parser:
+        print(token)
