@@ -96,5 +96,5 @@ arr = [1,2,3]
 z <- arr[2]
 '''
     parser = Parser(pseudocode)
-    for token in parser:
-        print(token)
+    while True:
+        print(next(parser))
