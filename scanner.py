@@ -38,27 +38,27 @@ keywords = {'if': Token.IF_TOKEN, 'or': Token.OR_TOKEN, 'for': Token.FOR_TOKEN, 
 
 
 def scanner(text: str, i: int) -> Tuple[int, Token, str]:
-    if text[i] == '<':
-        if text[i + 1] == '=':
-            return i+1, Token.COMPARISON_OPERATORS, '<='
-        if text[i+1] == '-':
-            return i+1, Token.ASSIGN, '<-'
-        return i, Token.PLUS, text[i]
-
-    if text[i] == '-':
-        return i, Token.PLUS, text[i]
-    if text[i] == '*':
-        return i, Token.PLUS, text[i]
-    if text[i] == '/':
-        return i, Token.PLUS, text[i]
+    if len(text) > i + 1 and text[i: i + 2] == '<-':
+        return i + 1, Token.ASSIGN, '<-'
+    if text[i] == '{':
+        return i, Token.CURLY_BRACKET_BEGIN, '{'
+    if text[i] == '}':
+        return i, Token.CURLY_BRACKET_END, '}'
     if text[i] == '(':
-        return i, Token.PLUS, text[i]
+        return i, Token.ROUND_BRACKET_BEGIN, '('
     if text[i] == ')':
-        return i, Token.PLUS, text[i]
-    if text[i] == '=':
-        return i, Token.EQUALS, text[i]
-    if text[i] == ':':
-        return i, Token.COLON, text[i]
+        return i, Token.ROUND_BRACKET_END, ')'
+    if text[i] == '[':
+        return i, Token.SQUARE_BRACKET_BEGIN, '['
+    if text[i] == ']':
+        return i, Token.SQUARE_BRACKET_END, ']'
+    if text[i] == '"':
+        return i, Token.QUOTATION_MARK, '"'
+    if text[i] == ',':
+        return i, Token.COMMA, ','
+    if text[i] == '.':
+        if len(text) > i + 2 and text[i + 1] == '.' and text[i + 2] == '.':
+            return i + 2, Token.BETWEEN, '...'
     if text[i].isalpha():
         identifier = ''
         while i < len(text) and (text[i].isdigit() or text[i].isalpha()):
@@ -75,8 +75,16 @@ def scanner(text: str, i: int) -> Tuple[int, Token, str]:
         if i < len(text) and text[i].isalpha():
             return i, Token.ERROR, number + text[i]
         return i - 1, Token.NUMBER, number
+    if text[i] in ('+', '-', '*', '/', '%', '^'):
+        return i, Token.MATH_OPERATORS, text[i]
+    if text[i] in ('<', '>', '='):
+        if len(text) > i + 1 and text[i + 1] == '=' and text[i] != '=':
+            return i + 1, Token.COMPARISON_OPERATORS, text[i] + '='
+        return i, Token.COMPARISON_OPERATORS, text[i]
+    if text[i] == '\n':
+        return i, Token.NEW_LINE, text[i]
     if text[i].isspace():
-        return i, Token.BLANK, text[i]
+        return i, Token.WHITESPACE, text[i]
     return i, Token.ERROR, text[i]
 
 
@@ -84,18 +92,27 @@ def scan(text: str) -> None:
     i = 0
     while i < len(text):
         i, token, communicat = scanner(text, i)
-        print(communicat, end='')
+        print(communicat, token)
         i += 1
 
 
 if __name__ == '__main__':
-    scan('''def scan(text: str) -> None:
-    i = 0
-    while i < len(text):
-        i, token, communicat = scanner(text, i)
-        color = token_colors.get(token)
-        if color is not None:
-            print(color + communicat + Fore.RESET, end='')
-        else:
-            print(communicat + Fore.RESET, end='')
-        i += 1''')
+    scan('''x <- 1
+if x = 1{
+    y<-2
+} else {
+    y<-3
+}
+
+my_print(x){
+    for i <- 1…x{
+        print i
+    }
+    return true
+}
+
+my_print(5)
+
+arr = [1,2,3]
+z <- arr[2]
+''')
