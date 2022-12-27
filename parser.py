@@ -27,12 +27,14 @@ class Parser:
             return i, Token.QUOTATION_MARK, '"'
         if text[i] == ',':
             return i, Token.COMMA, ','
+        if text[i] == ';':
+            return i, Token.SEMICOLON, ';'
         if text[i] == '.':
             if len(text) > i + 2 and text[i + 1] == '.' and text[i + 2] == '.':
                 return i + 2, Token.BETWEEN, '...'
-        if text[i].isalpha():
+        if text[i].isalpha() or text[i] == '_':
             identifier = ''
-            while i < len(text) and (text[i].isdigit() or text[i].isalpha()):
+            while i < len(text) and (text[i].isdigit() or text[i].isalpha() or text[i] == '_'):
                 identifier += text[i]
                 if identifier in keywords.keys():
                     return i, keywords[identifier], identifier
@@ -76,24 +78,24 @@ class Parser:
 
 
 if __name__ == '__main__':
-    pseudocode = '''x <- 1
+    pseudocode = '''x <- 1;
 if x = 1{
-    y<-2
+	y<-2;
 } else {
-    y<-3
+	y<-3;
 }
 
 my_print(x){
-    for i <- 1…x{
-        print i
-    }
-    return true
+	for i <- 1…x{
+		print i;
+	}
+	return true;
 }
 
-my_print(5)
+my_print(5);
 
-arr = [1,2,3]
-z <- arr[2]
+arr = [1,2,3];
+z <- arr[2];
 '''
     parser = Parser(pseudocode)
     while True:
