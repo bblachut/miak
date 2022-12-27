@@ -20,20 +20,14 @@ class Generator:
             raise EOFError
         return token
 
-    def _check_if_right_token(self, right_token: List[Token]) -> (str, bool):
+    def _check_if_right_token(self, right_token: List[Token]) -> (Token, str):
         communicat, token = self.next_token()
         if token not in right_token:
             self.saved_token = (communicat, token)
-            return False
-        return token, communicat, True
+            print("Segmentation fault")
+            exit()
+        return token, communicat
 
-    def _check_statement(self):
-        # TODO
-        # jesli false to dodajemy do saved token
-        pass
-
-    '''for_statement: for_token id assign [id | number] between [id | number] curly_bracket_begin
-      [statement([statement])*] curly_bracket_end'''
 
     def _add_to_code(self, token: Token, communicat: str):
 
@@ -57,11 +51,7 @@ class Generator:
         else:
             self.code += communicat
 
-    def _check_if_correct(self, token: Token, communicat: str, result: bool):
-        if result:
-            self._add_to_code(token, communicat)
-        else:
-            exit()
+
 
     def _check_for_statement(self):
         try:
@@ -73,15 +63,62 @@ class Generator:
 
             self.code += f"for {id1[1]} in range({id2[1]},{id3[1]}):"
 
-            self._check_if_correct(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
+            self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
 
             res = self._check_statement()
             while (res):
                 res = self._check_statement()
 
-            self._check_if_correct(*self._check_if_right_token([Token.CURLY_BRACKET_END]))
+            self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_END]))
         except EOFError:
             exit()
+
+    # BASIA
+    def _check_statement(self):
+        # TODO
+        # jesli false to dodajemy do saved token
+        pass
+
+    def _check_expression(self):
+        pass
+
+    def _check_while_statement(self):
+        pass
+
+    def _check_if_statement(self):
+        pass
+
+    def _check_return_statement(self):
+        pass
+
+    def _check_function_definition(self):
+        pass
+
+    def _check_and_expression(self):
+        pass
+
+    # BOGUS
+
+    def _check_or_expression(self):
+        pass
+
+    def _check_comparision_operators_expression(self):
+        pass
+
+    def _check_math_operators_expression(self):
+        pass
+
+    def _check_array(self):
+        pass
+
+    def _check_declaration(self):
+        pass
+
+    def _check_function_call(self):
+        pass
+
+    def _check_string(self):
+        pass
 
     def generate(self) -> str:
 
