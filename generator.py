@@ -16,9 +16,8 @@ class Generator:
             self.saved_token = None
             return token
         token = next(self.parser, None)
-        if token == None:
-            # TODO
-            pass
+        if token is None:
+            raise EOFError
         return token
 
     def _check_if_right_token(self, right_token: List[Token]) -> (str, bool):
@@ -65,24 +64,24 @@ class Generator:
             exit()
 
     def _check_for_statement(self):
-        id1 = self._check_if_right_token([Token.ID])
-        ass1 = self._check_if_right_token([Token.ASSIGN])
-        id2 = self._check_if_right_token([Token.ID, Token.NUMBER])
-        btw = self._check_if_right_token([Token.BETWEEN])
-        id3 = self._check_if_right_token([Token.ID, Token.NUMBER])
+        try:
+            id1 = self._check_if_right_token([Token.ID])
+            ass1 = self._check_if_right_token([Token.ASSIGN])
+            id2 = self._check_if_right_token([Token.ID, Token.NUMBER])
+            btw = self._check_if_right_token([Token.BETWEEN])
+            id3 = self._check_if_right_token([Token.ID, Token.NUMBER])
 
-        if (id1[2] and ass1[2] and id2[2] and btw[2] and id3[2]):
             self.code += f"for {id1[1]} in range({id2[1]},{id3[1]}):"
-        else:
-            exit()
 
-        self._check_if_correct(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
+            self._check_if_correct(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
 
-        res = self._check_statement()
-        while (res):
             res = self._check_statement()
+            while (res):
+                res = self._check_statement()
 
-        self._check_if_correct(*self._check_if_right_token([Token.CURLY_BRACKET_END]))
+            self._check_if_correct(*self._check_if_right_token([Token.CURLY_BRACKET_END]))
+        except EOFError:
+            exit()
 
     def generate(self) -> str:
 
