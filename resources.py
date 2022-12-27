@@ -24,7 +24,6 @@ class Token(Enum):
     COMMA = 20
     BETWEEN = 21
     WHITESPACE = 22
-    NEW_LINE = 23
     ERROR = 24
     BOOLEAN = 25
     ID = 26

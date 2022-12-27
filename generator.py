@@ -7,19 +7,25 @@ class Generator:
     def __init__(self, pseudocode: str):
         self.parser = Parser(pseudocode)
         self.code = ""
+        self.saved_token = None
 
     def next_token(self) -> Tuple[str, Token]:
-        tupl = next(self.parser, None)
-        if tupl == None:
+        if self.saved_token is not None:
+            token = self.saved_token
+            self.saved_token = None
+            return token
+        token = next(self.parser, None)
+        if token == None:
             # TODO
             pass
-        return tupl
+        return token
 
     def _check_if_right_token(self, right_token: List[Token]) -> (str,bool):
         communicat, token = self.next_token()
-        if token != right_token:
+        if token not in right_token:
+            self.saved_token = (communicat, token)
             return False
-        return (communicat,True)
+        return communicat, True
 
     def _check_statement(self):
         #TODO
