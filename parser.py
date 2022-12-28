@@ -57,12 +57,12 @@ class Parser:
             return i, Token.WHITESPACE, text[i]
         return i, Token.ERROR, text[i]
 
-    def _parse(self, text: str) -> List[Tuple[str, Token]]:
+    def _parse(self, text: str) -> List[Tuple[Token, str]]:
         tokens = []
         i = 0
         while i < len(text):
             i, token, communicat = self._scanner(text, i)
-            tokens.append((communicat, token))
+            tokens.append((token, communicat))
             i += 1
         return tokens
 

@@ -1,6 +1,6 @@
 from parser import Parser
 from resources import Token
-from typing import List,Tuple
+from typing import List, Tuple, Union
 
 
 class Generator:
@@ -10,7 +10,7 @@ class Generator:
         self.saved_token = None
         self.indent_ctr = 0
 
-    def next_token(self) -> Tuple[str, Token]:
+    def next_token(self) -> Tuple[Token, str]:
         if self.saved_token is not None:
             token = self.saved_token
             self.saved_token = None
@@ -20,22 +20,29 @@ class Generator:
             raise EOFError
         return token
 
-    def _check_if_right_token(self, right_token: List[Token]) -> (Token, str):
-        communicat, token = self.next_token()
-        if token not in right_token:
-            self.saved_token = (communicat, token)
+    def _check_if_right_token(self, right_tokens: List[Token]) -> Tuple[Token, str]:
+        token, communicat = self.next_token()
+        if token not in right_tokens:
             print("Segmentation fault")
             exit()
         return token, communicat
 
+    def _check_optional_token(self, expected_tokens: List[Token]) -> Union[Tuple[Token, str],Tuple[None, None]]:
+        token, communicat = self.next_token()
+        if token not in expected_tokens:
+            self.saved_token = (token, communicat)
+            return None, None
+        return token, communicat
 
     def _add_to_code(self, token: Token, communicat: str):
 
         if token == Token.ASSIGN:
             self.code += "="
 
-        elif token == Token.COMPARISON_OPERATORS and communicat == "=":
-            self.code += "=="
+        elif token in (Token.COMPARISON_OPERATORS, Token.MATH_OPERATORS):
+            if communicat == "=":
+                communicat += "=="
+            self.code += " " + communicat + " "
 
         elif token == Token.CURLY_BRACKET_BEGIN:
             self.code += ":"
@@ -54,7 +61,7 @@ class Generator:
 
 
     def _check_for_statement(self):
-        try:
+        try: # chyba niepotrzebne
             id1 = self._check_if_right_token([Token.ID])
             ass1 = self._check_if_right_token([Token.ASSIGN])
             id2 = self._check_if_right_token([Token.ID, Token.NUMBER])
@@ -117,12 +124,24 @@ class Generator:
     def _check_function_call(self):
         pass
 
+    def _check_variable_type(self):
+        token, communicat = self._check_optional_token([Token.BOOLEAN, Token.NUMBER, Token.ID])
+        if token is not None:
+            self._add_to_code(token, communicat)
+            return True
+        if self._check_array():
+            return True
+        if self._check_string():
+            return True
+        return False
+
+
     def _check_string(self):
         pass
 
     def generate(self) -> str:
 
         while (1):
-            communicat, token = self.next_token()
+            token, communicat = self.next_token()
             if token == Token.FOR_TOKEN:
                 self._check_for_statement()
