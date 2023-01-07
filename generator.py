@@ -11,7 +11,7 @@ class Generator:
         self.saved_token = None
         self.indent_ctr = 0
 
-    def next_token(self) -> Tuple[Token, str]:
+    def _next_token_whitespace(self) -> Tuple[Token, str]:
         if self.saved_token is not None:
             token = self.saved_token
             self.saved_token = None
@@ -19,17 +19,26 @@ class Generator:
         token = next(self.parser, None)
         if token is None:
             raise EOFError
+        if token[0] == Token.ERROR:
+            print("Token error")
+            exit()
+        return token
+
+    def _next_token(self) -> Tuple[Token, str]:
+        token = self._next_token_whitespace()
+        if token[0] == Token.WHITESPACE:
+            return self._next_token()
         return token
 
     def _check_if_right_token(self, right_tokens: List[Token]) -> Tuple[Token, str]:
-        token, communicat = self.next_token()
+        token, communicat = self._next_token()
         if token not in right_tokens:
             print("Wrong token")
             exit()
         return token, communicat
 
     def _check_optional_token(self, expected_tokens: List[Token]) -> Union[Tuple[Token, str], Tuple[None, None]]:
-        token, communicat = self.next_token()
+        token, communicat = self._next_token()
         if token not in expected_tokens:
             self.saved_token = (token, communicat)
             return None, None
@@ -211,7 +220,15 @@ class Generator:
         return False
 
     def _check_string(self):
-        pass
+        token, communicat = self._check_optional_token([Token.QUOTATION_MARK])
+        if token is None:
+            return False
+        self._add_to_code(token, communicat)
+        token, communicat = self._next_token_whitespace()
+        while token != Token.QUOTATION_MARK:
+            self._add_to_code(Token.STRING, communicat)
+            token, communicat = self._next_token_whitespace()
+        self._add_to_code(token, communicat)
 
     def generate(self) -> str:
         pass

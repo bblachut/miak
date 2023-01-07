@@ -29,6 +29,7 @@ class Token(Enum):
     ID = 26
     NUMBER = 27
     SEMICOLON = 28
+    STRING = 29  # used only to make code smoother, not checked by parser
 
 keywords = {'if': Token.IF_TOKEN, 'or': Token.OR_TOKEN, 'for': Token.FOR_TOKEN, 'not': Token.NOT_TOKEN,
             'else': Token.ELSE_TOKEN, 'while': Token.WHILE_TOKEN, 'return': Token.RETURN_TOKEN, 'continue': Token.SKIP,
