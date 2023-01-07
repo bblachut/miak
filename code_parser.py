@@ -53,6 +53,8 @@ class Parser:
         if text[i] in ('<', '>', '=', '!'):
             if len(text) > i + 1 and text[i + 1] == '=' and text[i] != '=':
                 return i + 1, Token.COMPARISON_OPERATORS, text[i] + '='
+            if text[i] == '=':
+                return i, Token.COMPARISON_OPERATORS, '='
         if text[i].isspace():
             return i, Token.WHITESPACE, text[i]
         return i, Token.ERROR, text[i]

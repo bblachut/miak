@@ -127,6 +127,7 @@ class Generator:
 
         if not self._check_combined_expression():
             if not self._check_variable_type():
+                print("Wrong expression")
                 exit()
 
 
@@ -219,8 +220,6 @@ class Generator:
 
     # and,or,comparision_operators,math_operators
     def _check_combined_expression(self) -> bool:
-        if not self._check_expression():
-            return False
         token, communicat = self._check_optional_token(
             [Token.AND_TOKEN, Token.OR_TOKEN, Token.COMPARISON_OPERATORS, Token.MATH_OPERATORS])
         if token is None:
