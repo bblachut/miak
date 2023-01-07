@@ -1,6 +1,6 @@
 from typing import List, Tuple, Union
 
-from parser import Parser
+from code_parser import Parser
 from resources import Token
 
 
@@ -118,7 +118,7 @@ class Generator:
                 if not self._check_if_statement():
                     if not self._check_return_statement():
                         if not self._check_id_starting():
-                                exit()
+                            exit()
 
     def _check_expression(self):
         not_res = self._check_optional_token([Token.NOT_TOKEN])
@@ -312,9 +312,9 @@ class Generator:
 
     def generate(self):
         while True:
+            print(self.code)
             try:
-                if self._check_statement():
-                    continue
+                self._check_statement()
 
             except EOFError:
                 print(self.code)
