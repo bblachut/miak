@@ -185,7 +185,7 @@ class Generator:
 
         return True
 
-    def _check_function_definition(self):
+    def _check_function_definition(self) -> bool:
         func_res = self._check_optional_token([Token.FUNCTION])
         if func_res[1] is None:
             return False
@@ -219,7 +219,7 @@ class Generator:
         return True
 
     # and,or,comparision_operators,math_operators
-    def _check_combined_expression(self):
+    def _check_combined_expression(self) -> bool:
         if not self._check_expression():
             return False
         token, communicat = self._check_optional_token(
@@ -230,8 +230,9 @@ class Generator:
         if not self._check_expression():
             print("Error: expected expression")
             exit()
+        return True
 
-    def _check_array(self):
+    def _check_array(self) -> bool:
         token, communicat = self._check_optional_token([Token.SQUARE_BRACKET_BEGIN])
         if token is None:
             return False
@@ -250,8 +251,9 @@ class Generator:
 
         token, communicat = self._check_if_right_token([Token.SQUARE_BRACKET_END])
         self._add_to_code(token, communicat)
+        return True
 
-    def _check_declaration(self):
+    def _check_declaration(self) -> bool:
         token, communicat = self._check_optional_token([Token.ASSIGN])
         if token is None:
             return False
@@ -259,8 +261,9 @@ class Generator:
         if not self._check_variable_type():
             print("ERROR: expected variable type in declaration")
             exit()
+        return True
 
-    def _check_function_call(self):
+    def _check_function_call(self) -> bool:
         token, communicat = self._check_optional_token([Token.ROUND_BRACKET_BEGIN])
         if token is None:
             return False
@@ -274,8 +277,9 @@ class Generator:
             self._check_variable_type()
         token, communicat = self._check_if_right_token([Token.ROUND_BRACKET_END])
         self._add_to_code(token, communicat)
+        return True
 
-    def _check_variable_type(self):
+    def _check_variable_type(self) -> bool:
         token, communicat = self._check_optional_token([Token.BOOLEAN, Token.NUMBER, Token.ID])
         if token is not None or self._check_array() or self._check_string():
             self._add_to_code(token, communicat)
@@ -287,7 +291,7 @@ class Generator:
         return False
 
     #  will print only correct tokens (maybe we should add errors to be availabl
-    def _check_string(self):
+    def _check_string(self) -> bool:
         token, communicat = self._check_optional_token([Token.QUOTATION_MARK])
         if token is None:
             return False
@@ -299,7 +303,7 @@ class Generator:
         self._add_to_code(token, communicat)
         return True
 
-    def _check_id_starting(self):
+    def _check_id_starting(self) -> bool:
         token, communicat = self._check_optional_token([Token.ID])
         if token is None:
             return False
