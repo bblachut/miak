@@ -34,4 +34,4 @@ class Token(Enum):
 
 keywords = {'if': Token.IF_TOKEN, 'or': Token.OR_TOKEN, 'for': Token.FOR_TOKEN, 'not': Token.NOT_TOKEN,
             'else': Token.ELSE_TOKEN, 'while': Token.WHILE_TOKEN, 'return': Token.RETURN_TOKEN, 'continue': Token.SKIP,
-            'break': Token.SKIP, 'and': Token.AND_TOKEN, 'True': Token.BOOLEAN, 'False': Token.BOOLEAN}
+            'break': Token.SKIP, 'and': Token.AND_TOKEN, 'True': Token.BOOLEAN, 'False': Token.BOOLEAN, 'function': Token.FUNCTION}

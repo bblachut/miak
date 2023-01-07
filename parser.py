@@ -50,7 +50,7 @@ class Parser:
             return i - 1, Token.NUMBER, number
         if text[i] in ('+', '-', '*', '/', '%', '^'):
             return i, Token.MATH_OPERATORS, text[i]
-        if text[i] in ('<', '>', '='):
+        if text[i] in ('<', '>', '=', '!'):
             if len(text) > i + 1 and text[i + 1] == '=' and text[i] != '=':
                 return i + 1, Token.COMPARISON_OPERATORS, text[i] + '='
         if text[i].isspace():
