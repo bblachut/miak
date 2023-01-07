@@ -33,7 +33,7 @@ class Generator:
     def _check_if_right_token(self, right_tokens: List[Token]) -> Tuple[Token, str]:
         token, communicat = self._next_token()
         if token not in right_tokens:
-            print("Wrong token")
+            print("Wrong token - check grammar")
             exit()
         return token, communicat
 
@@ -51,7 +51,7 @@ class Generator:
 
         elif token in (Token.COMPARISON_OPERATORS, Token.MATH_OPERATORS):
             if communicat == "=":
-                communicat += "=="
+                communicat += "="
             self.code += " " + communicat + " "
 
         elif token == Token.CURLY_BRACKET_BEGIN:
@@ -87,11 +87,14 @@ class Generator:
             return False
 
         try:  # chyba niepotrzebne
+            self._check_if_right_token([Token.ROUND_BRACKET_BEGIN])
             id1 = self._check_if_right_token([Token.ID])
             ass1 = self._check_if_right_token([Token.ASSIGN])
             id2 = self._check_if_right_token([Token.ID, Token.NUMBER])
             btw = self._check_if_right_token([Token.BETWEEN])
             id3 = self._check_if_right_token([Token.ID, Token.NUMBER])
+
+            self._check_if_right_token([Token.ROUND_BRACKET_END])
 
             self._add_to_code(*for_res)
             self._add_to_code(*id1)
@@ -101,7 +104,6 @@ class Generator:
             self._add_to_code(Token.ID, ",")
             self._add_to_code(*id3)
             self._add_to_code(Token.ROUND_BRACKET_END, ")")
-
             self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
 
             self._check_statement_or_skip()
@@ -112,23 +114,24 @@ class Generator:
 
         return True
 
-    def _check_statement(self):
+    def _check_statement(self) -> bool:
         if not self._check_id_starting():
             if not self._check_for_statement():
                 if not self._check_while_statement():
                     if not self._check_if_statement():
                         if not self._check_return_statement():
-                            exit()
+                            return False
+        return True
 
-    def _check_expression(self):
+    def _check_expression(self) -> bool:
         not_res = self._check_optional_token([Token.NOT_TOKEN])
         if not_res[1] is not None:
             self._add_to_code(*not_res)
 
-        if not self._check_combined_expression():
-            if not self._check_variable_type():
-                print("Wrong expression")
-                exit()
+        if self._check_variable_type():
+            self._check_combined_expression()
+            return True
+        return False
 
 
     def _check_while_statement(self) -> bool:
@@ -137,7 +140,9 @@ class Generator:
             return False
         try:
             self._add_to_code(*while_res)
+            self._check_if_right_token([Token.ROUND_BRACKET_BEGIN])
             self._check_expression()
+            self._check_if_right_token([Token.ROUND_BRACKET_END])
 
             self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
 
@@ -155,7 +160,9 @@ class Generator:
             return False
         try:
             self._add_to_code(*if_res)
+            self._check_if_right_token([Token.ROUND_BRACKET_BEGIN])
             self._check_expression()
+            self._check_if_right_token([Token.ROUND_BRACKET_END])
             self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
             self._check_statement_or_skip()
             self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_END]))
@@ -206,9 +213,11 @@ class Generator:
             self._add_to_code(*self._check_if_right_token([Token.ROUND_BRACKET_END]))
             self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
 
-            res = self._check_statement()
-            while res:
-                res = self._check_statement()
+            if not self._check_statement():
+                exit()
+            while self._check_statement():
+                #checking additional statements in function def
+                pass
 
             self._check_return_statement()
 
@@ -315,11 +324,12 @@ class Generator:
         return False
 
     def generate(self):
-        while True:
-            print(self.code)
-            try:
-                self._check_statement()
-
-            except EOFError:
+        try:
+            while self._check_statement():
                 print(self.code)
-                break
+                pass
+
+        except EOFError:
+            print(self.code)
+
+        print("Not a statement")

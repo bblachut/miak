@@ -8,7 +8,7 @@ if (x = 1){
 	y<-3;
 }
 
-my_print(x){
+function my_print(x){
 	for i <- 1…x{
 		print i;
 	}
