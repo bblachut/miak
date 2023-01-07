@@ -113,11 +113,11 @@ class Generator:
         return True
 
     def _check_statement(self):
-        if not self._check_for_statement():
-            if not self._check_while_statement():
-                if not self._check_if_statement():
-                    if not self._check_return_statement():
-                        if not self._check_id_starting():
+        if not self._check_id_starting():
+            if not self._check_for_statement():
+                if not self._check_while_statement():
+                    if not self._check_if_statement():
+                        if not self._check_return_statement():
                             exit()
 
     def _check_expression(self):
@@ -128,10 +128,7 @@ class Generator:
         if not self._check_combined_expression():
             if not self._check_variable_type():
                 exit()
-            else:
-                self._check_if_right_token([Token.SEMICOLON])
-        else:
-            self._check_if_right_token([Token.SEMICOLON])
+
 
     def _check_while_statement(self) -> bool:
         while_res = self._check_optional_token([Token.WHILE_TOKEN])
@@ -182,6 +179,8 @@ class Generator:
             return False
         self._add_to_code(*return_res)
         self._check_variable_type()
+
+        self._check_if_right_token([Token.SEMICOLON])
 
         return True
 
@@ -261,6 +260,7 @@ class Generator:
         if not self._check_variable_type():
             print("ERROR: expected variable type in declaration")
             exit()
+        self._check_if_right_token([Token.SEMICOLON])
         return True
 
     def _check_function_call(self) -> bool:
@@ -277,6 +277,7 @@ class Generator:
             self._check_variable_type()
         token, communicat = self._check_if_right_token([Token.ROUND_BRACKET_END])
         self._add_to_code(token, communicat)
+        self._check_if_right_token([Token.SEMICOLON])
         return True
 
     def _check_variable_type(self) -> bool:

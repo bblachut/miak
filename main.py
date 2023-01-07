@@ -1,5 +1,4 @@
 from generator import Generator
-from code_parser import Parser
 
 if __name__ == '__main__':
     pseudocode = '''x <- 1;
@@ -18,7 +17,7 @@ my_print(x){
 
 my_print(5);
 
-arr = [1,2,3];
+arr <- [1,2,3];
 z <- arr[2];
 '''
     generator = Generator(pseudocode)
