@@ -128,9 +128,6 @@ class Generator:
         else:
             self._check_if_right_token([Token.SEMICOLON])
 
-
-
-
     def _check_while_statement(self) -> bool:
         while_res = self._check_optional_token([Token.WHILE_TOKEN])
         if while_res[1] is None:
@@ -166,7 +163,7 @@ class Generator:
 
             # else
             else_res = self._check_optional_token([Token.ELSE_TOKEN])
-            if  else_res[1] is not None:
+            if else_res[1] is not None:
                 self._add_to_code(*else_res)
                 self._check_expression()
                 self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
@@ -193,7 +190,7 @@ class Generator:
     def _check_function_definition(self):
         pass
 
-    #and,or,comparision_operators,math_operators
+    # and,or,comparision_operators,math_operators
     def _check_math_expression(self):
         pass
 
@@ -219,12 +216,29 @@ class Generator:
         token, communicat = self._check_if_right_token([Token.SQUARE_BRACKET_END])
         self._add_to_code(token, communicat)
 
-
     def _check_declaration(self):
-        pass
+        token, communicat = self._check_optional_token([Token.ASSIGN])
+        if token is None:
+            return False
+        self._add_to_code(token, communicat)
+        if not self._check_variable_type():
+            print("ERROR: expected variable type in declaration")
+            exit()
 
     def _check_function_call(self):
-        pass
+        token, communicat = self._check_optional_token([Token.ROUND_BRACKET_BEGIN])
+        if token is None:
+            return False
+        self._add_to_code(token, communicat)
+        self._check_variable_type()
+        while True:
+            token, communicat = self._check_optional_token([Token.COMMA])
+            if token is None:
+                break
+            self._add_to_code(token, communicat)
+            self._check_variable_type()
+        token, communicat = self._check_if_right_token([Token.ROUND_BRACKET_END])
+        self._add_to_code(token, communicat)
 
     def _check_variable_type(self):
         token, communicat = self._check_optional_token([Token.BOOLEAN, Token.NUMBER, Token.ID])
@@ -238,6 +252,7 @@ class Generator:
         return False
 
     def _check_string(self):
+        #  will print only correct tokens (maybe we should add errors to be available too?)
         token, communicat = self._check_optional_token([Token.QUOTATION_MARK])
         if token is None:
             return False
@@ -248,6 +263,17 @@ class Generator:
             token, communicat = self._next_token_whitespace()
         self._add_to_code(token, communicat)
         return True
+
+    def _check_id_starting(self):
+        token, communicat = self._check_optional_token([Token.ID])
+        if token is None:
+            return False
+        self._add_to_code(token, communicat)
+        if self._check_declaration():
+            return True
+        if self._check_function_call():
+            return True
+        return False
 
     def generate(self) -> str:
         pass
