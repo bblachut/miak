@@ -117,8 +117,7 @@ class Generator:
             if not self._check_while_statement():
                 if not self._check_if_statement():
                     if not self._check_return_statement():
-                        if not self._check_declaration():
-                            if not self._check_function_call():
+                        if not self._check_id_starting():
                                 exit()
 
     def _check_expression(self):
@@ -311,5 +310,12 @@ class Generator:
             return True
         return False
 
-    def generate(self) -> str:
-        pass
+    def generate(self):
+        while True:
+            try:
+                if self._check_statement():
+                    continue
+
+            except EOFError:
+                print(self.code)
+                break
