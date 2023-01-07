@@ -200,7 +200,25 @@ class Generator:
     # BOGUS
 
     def _check_array(self):
-        pass
+        token, communicat = self._check_optional_token([Token.SQUARE_BRACKET_BEGIN])
+        if token is None:
+            return False
+        self._add_to_code(token, communicat)
+        if not self._check_variable_type():
+            print("ERROR: expected variable type in array")
+            exit()
+        while True:
+            token, communicat = self._check_optional_token([Token.COMMA])
+            if token is None:
+                break
+            self._add_to_code(token, communicat)
+            if not self._check_variable_type():
+                print("ERROR: expected variable type in array")
+                exit()
+
+        token, communicat = self._check_if_right_token([Token.SQUARE_BRACKET_END])
+        self._add_to_code(token, communicat)
+
 
     def _check_declaration(self):
         pass
@@ -210,7 +228,7 @@ class Generator:
 
     def _check_variable_type(self):
         token, communicat = self._check_optional_token([Token.BOOLEAN, Token.NUMBER, Token.ID])
-        if token is not None:
+        if token is not None or self._check_array() or self._check_string():
             self._add_to_code(token, communicat)
             return True
         if self._check_array():
@@ -229,6 +247,7 @@ class Generator:
             self._add_to_code(Token.STRING, communicat)
             token, communicat = self._next_token_whitespace()
         self._add_to_code(token, communicat)
+        return True
 
     def generate(self) -> str:
         pass
