@@ -52,18 +52,24 @@ class Generator:
         elif token in (Token.COMPARISON_OPERATORS, Token.MATH_OPERATORS):
             if communicat == "=":
                 communicat += "="
-            self.code += " " + communicat + " "
+            self.code +=  communicat
 
         elif token == Token.CURLY_BRACKET_BEGIN:
-            self.code += ":"
+            self.code += ":\n"
             self.indent_ctr += 1
+            self.code += " " * 4 * self.indent_ctr
 
         elif token == Token.CURLY_BRACKET_END:
+            self.code = self.code[:-4]
             self.indent_ctr -= 1
 
         elif token == Token.SEMICOLON:
             self.code += "\n"
             self.code += " " * 4 * self.indent_ctr
+
+        elif token in [Token.IF_TOKEN, Token.FOR_TOKEN, Token.OR_TOKEN, Token.AND_TOKEN, Token.NOT_TOKEN,
+                       Token.RETURN_TOKEN, Token.FUNCTION]:
+            self.code += communicat + " "
 
         else:
             self.code += communicat
@@ -99,7 +105,7 @@ class Generator:
 
             self._add_to_code(*for_res)
             self._add_to_code(*id1)
-            self._add_to_code(Token.STRING, "in range")
+            self._add_to_code(Token.STRING, " in range")
             self._add_to_code(Token.ROUND_BRACKET_BEGIN, "(")
             self._add_to_code(*id2)
             self._add_to_code(Token.ID, ",")
@@ -193,7 +199,7 @@ class Generator:
         self._add_to_code(*return_res)
         self._check_variable_type()
 
-        self._check_if_right_token([Token.SEMICOLON])
+        self._add_to_code(*self._check_if_right_token([Token.SEMICOLON]))
 
         return True
 
@@ -275,7 +281,7 @@ class Generator:
         if not self._check_variable_type():
             print("ERROR: expected variable type in declaration")
             exit()
-        self._check_if_right_token([Token.SEMICOLON])
+        self._add_to_code(*self._check_if_right_token([Token.SEMICOLON]))
         return True
 
     def _check_function_call(self) -> bool:
@@ -292,7 +298,7 @@ class Generator:
             self._check_variable_type()
         token, communicat = self._check_if_right_token([Token.ROUND_BRACKET_END])
         self._add_to_code(token, communicat)
-        self._check_if_right_token([Token.SEMICOLON])
+        self._add_to_code(*self._check_if_right_token([Token.SEMICOLON]))
         return True
 
     def _check_variable_type(self) -> bool:
@@ -333,7 +339,6 @@ class Generator:
     def generate(self):
         try:
             while self._check_statement():
-                print(self.code)
                 pass
 
         except EOFError:
