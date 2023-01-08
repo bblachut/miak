@@ -67,6 +67,12 @@ class Generator:
             self.code += "\n"
             self.code += " " * 4 * self.indent_ctr
 
+        elif token == Token.FUNCTION:
+            self.code += "def "
+
+        elif token == Token.BOOLEAN:
+            self.code += communicat.capitalize()
+
         elif token in [Token.IF_TOKEN, Token.FOR_TOKEN, Token.OR_TOKEN, Token.AND_TOKEN, Token.NOT_TOKEN,
                        Token.RETURN_TOKEN, Token.FUNCTION]:
             self.code += communicat + " "
@@ -281,6 +287,7 @@ class Generator:
         if not self._check_variable_type():
             print("ERROR: expected variable type in declaration")
             exit()
+        self._check_array_element()
         self._add_to_code(*self._check_if_right_token([Token.SEMICOLON]))
         return True
 
@@ -330,11 +337,31 @@ class Generator:
         if token is None:
             return False
         self._add_to_code(token, communicat)
+        if self._check_array_element():
+            self._check_declaration()
+            return True
         if self._check_declaration():
             return True
         if self._check_function_call():
             return True
         return False
+
+    def _check_array_element(self) -> bool:
+        token, communicat = self._check_optional_token([Token.SQUARE_BRACKET_BEGIN])
+        if token is None:
+            return False
+        self._add_to_code(token, communicat)
+        if not self._check_variable_type():
+            print("ERROR: expected variable type in array")
+            exit()
+        token, communicat = self._check_if_right_token([Token.SQUARE_BRACKET_END])
+        self._add_to_code(token, communicat)
+        return True
+
+    def _write_to_file(self):
+        file = open("result.py", "w")
+        file.write(self.code)
+        file.close()
 
     def generate(self):
         try:
@@ -342,7 +369,7 @@ class Generator:
                 pass
 
         except EOFError:
-            print(self.code)
+            self._write_to_file()
             exit()
 
         print("Not a statement")

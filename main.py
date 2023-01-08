@@ -1,7 +1,8 @@
 from generator import Generator
 
 if __name__ == '__main__':
-    pseudocode = '''x <- 1;
+    pseudocode = '''
+x <- 1;
 if (x = 1){
 	y<-2;
 } else {
@@ -18,6 +19,8 @@ function my_print(x){
 my_print(5);
 
 arr <- [1,2,3];
+arr[1] <- 5;
+z <- arr[2];
 '''
     generator = Generator(pseudocode)
     generator.generate()

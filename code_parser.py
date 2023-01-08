@@ -38,6 +38,8 @@ class Parser:
                 identifier += text[i]
                 if identifier in keywords.keys():
                     return i, keywords[identifier], identifier
+                if identifier in ["true", "false"]:
+                    return i, Token.BOOLEAN, identifier
                 i += 1
             return i - 1, Token.ID, identifier
         if text[i].isdigit():
