@@ -30,8 +30,10 @@ class Token(Enum):
     NUMBER = 27
     SEMICOLON = 28
     FUNCTION = 29
-    STRING = 30  # used only to make code smoother, not checked by parser
+    STRING = 31  # used only to make code smoother, not checked by parser
+
 
 keywords = {'if': Token.IF_TOKEN, 'or': Token.OR_TOKEN, 'for': Token.FOR_TOKEN, 'not': Token.NOT_TOKEN,
             'else': Token.ELSE_TOKEN, 'while': Token.WHILE_TOKEN, 'return': Token.RETURN_TOKEN, 'continue': Token.SKIP,
-            'break': Token.SKIP, 'and': Token.AND_TOKEN, 'True': Token.BOOLEAN, 'False': Token.BOOLEAN, 'function': Token.FUNCTION}
+            'break': Token.SKIP, 'and': Token.AND_TOKEN, 'True': Token.BOOLEAN, 'False': Token.BOOLEAN,
+            'function': Token.FUNCTION}

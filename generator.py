@@ -68,7 +68,7 @@ class Generator:
         else:
             self.code += communicat
 
-    def _check_statement_or_skip(self):
+    def _check_statement_or_skip(self) -> bool:
         res = self._check_statement()
         if not res:
             self._add_to_code(*self._check_if_right_token([Token.SKIP]))
@@ -80,6 +80,7 @@ class Generator:
                     break
                 else:
                     self._add_to_code(*skip_res)
+        return True
 
     def _check_for_statement(self) -> bool:
         for_res = self._check_optional_token([Token.FOR_TOKEN])
@@ -98,7 +99,7 @@ class Generator:
 
             self._add_to_code(*for_res)
             self._add_to_code(*id1)
-            self._add_to_code(Token.ID, "in range")
+            self._add_to_code(Token.STRING, "in range")
             self._add_to_code(Token.ROUND_BRACKET_BEGIN, "(")
             self._add_to_code(*id2)
             self._add_to_code(Token.ID, ",")
@@ -120,7 +121,8 @@ class Generator:
                 if not self._check_while_statement():
                     if not self._check_if_statement():
                         if not self._check_return_statement():
-                            return False
+                            if not self._check_function_definition():
+                                return False
         return True
 
     def _check_expression(self) -> bool:
@@ -141,7 +143,9 @@ class Generator:
         try:
             self._add_to_code(*while_res)
             self._check_if_right_token([Token.ROUND_BRACKET_BEGIN])
-            self._check_expression()
+            if not self._check_expression():
+                print("ERROR: while statement must have expression")
+                exit()
             self._check_if_right_token([Token.ROUND_BRACKET_END])
 
             self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
@@ -161,7 +165,9 @@ class Generator:
         try:
             self._add_to_code(*if_res)
             self._check_if_right_token([Token.ROUND_BRACKET_BEGIN])
-            self._check_expression()
+            if not self._check_expression():
+                print("ERROR: if statement must have expression")
+                exit()
             self._check_if_right_token([Token.ROUND_BRACKET_END])
             self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
             self._check_statement_or_skip()
@@ -169,9 +175,8 @@ class Generator:
 
             # else
             else_res = self._check_optional_token([Token.ELSE_TOKEN])
-            if  else_res[1] is not None:
+            if else_res[1] is not None:
                 self._add_to_code(*else_res)
-                self._check_expression()
                 self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
                 self._check_statement_or_skip()
                 self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_END]))
@@ -199,9 +204,11 @@ class Generator:
         try:
             self._add_to_code(*func_res)
             self._add_to_code(*self._check_if_right_token([Token.ID]))
-            self._add_to_code(*self._check_if_right_token([Token.CURLY_BRACKET_BEGIN]))
+            self._add_to_code(*self._check_if_right_token([Token.ROUND_BRACKET_BEGIN]))
 
             id1 = self._check_optional_token([Token.ID])
+            if id1[1] is not None:
+                self._add_to_code(*id1)
             if id1[1] is not None:
                 while True:
                     com1 = self._check_optional_token([Token.COMMA])
@@ -290,7 +297,7 @@ class Generator:
 
     def _check_variable_type(self) -> bool:
         token, communicat = self._check_optional_token([Token.BOOLEAN, Token.NUMBER, Token.ID])
-        if token is not None or self._check_array() or self._check_string():
+        if token is not None:
             self._add_to_code(token, communicat)
             return True
         if self._check_array():
@@ -331,5 +338,6 @@ class Generator:
 
         except EOFError:
             print(self.code)
+            exit()
 
         print("Not a statement")

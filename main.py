@@ -9,8 +9,8 @@ if (x = 1){
 }
 
 function my_print(x){
-	for i <- 1…x{
-		print i;
+	for (i <- 1...x){
+		print(i);
 	}
 	return true;
 }
@@ -18,7 +18,6 @@ function my_print(x){
 my_print(5);
 
 arr <- [1,2,3];
-z <- arr[2];
 '''
     generator = Generator(pseudocode)
     generator.generate()

@@ -72,6 +72,8 @@ class Parser:
         return self
 
     def __next__(self):
+        if len(self.tokens) == 0:
+            raise EOFError
         return self.tokens.pop(0)
 
 
